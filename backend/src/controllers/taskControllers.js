@@ -11,7 +11,7 @@ export const getAllTasks = async (req, res) => {
         }
         case 'week': {
             const mondayDate = now.getDate() - (now.getDay() - 1) - (now.getDay() === 0 ? 7 : 0);
-            startDate = newDate(now.getFullYear(), now.getMonth(), mondayDate);
+            startDate = new Date(now.getFullYear(), now.getMonth(), mondayDate);
             break;
         }
         case 'month': {

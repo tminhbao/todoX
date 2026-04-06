@@ -8,6 +8,7 @@ import TaskListPagination from "@/components/TaskListPagination";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import api from "@/lib/axios";
+import { visibleTaskLimit } from "@/lib/data";
 
 const HomePage = () => {
   // buffer: gom dữ liệu lại, sau đó mới xử lí tiếp
@@ -16,10 +17,15 @@ const HomePage = () => {
   const [completedTaskCount, setCompletedTaskCount] = useState(0);
   const [filter, setFilter] = useState("all");
   const [dateQuery, setDateQuery] = useState("today");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     fetchTasks();
   }, [dateQuery]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter, dateQuery]);
 
   const fetchTasks = async () => {
     try {
@@ -46,6 +52,29 @@ const HomePage = () => {
     }
   });
 
+  const visibleTasks = filteredTasks.slice(
+    (page - 1) * visibleTaskLimit,
+    page * visibleTaskLimit
+  );
+
+  const totalPages = Math.ceil(filteredTasks.length / visibleTaskLimit);
+
+  const handleNext = () => {
+    if (page < totalPages) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (page > 1) {
+      setPage((prev) => prev - 1);
+    }
+  };
+
+  const handlePageChange = (newPage) => setPage(newPage);
+
+  if (visibleTasks.length == 0) handlePrev();
+
   return (
     <div className="min-h-screen w-full bg-[#fefcff] relative">
       {/* Dreamy Sky Pink Glow */}
@@ -68,12 +97,18 @@ const HomePage = () => {
             setFilter={setFilter}
           />
           <TaskList
-            filteredTasks={filteredTasks}
+            filteredTasks={visibleTasks}
             filter={filter}
             handleTaskChanged={handleTaskChanged}
           />
           <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-            <TaskListPagination />
+            <TaskListPagination
+              handleNext={handleNext}
+              handlePrev={handlePrev}
+              handlePageChange={handlePageChange}
+              page={page}
+              totalPages={totalPages}
+            />
             <DateTimeFilter dateQuery={dateQuery} setDateQuery={setDateQuery} />
           </div>
           <Footer

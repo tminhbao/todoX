@@ -7,7 +7,7 @@ import TaskList from "@/components/TaskList";
 import TaskListPagination from "@/components/TaskListPagination";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import axios from "axios";
+import api from "@/lib/axios";
 
 const HomePage = () => {
   // buffer: gom dữ liệu lại, sau đó mới xử lí tiếp
@@ -22,7 +22,7 @@ const HomePage = () => {
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/api/tasks");
+      const res = await api.get("/tasks");
       setTaskBuffer(res.data.tasks);
       setActiveTaskCount(res.data.activeTaskCount);
       setCompletedTaskCount(res.data.completedTaskCount);
@@ -31,6 +31,8 @@ const HomePage = () => {
       toast.error("Lỗi xảy ra khi truy xuất tasks");
     }
   };
+
+  const handleTaskChanged = () => fetchTasks();
 
   const filteredTasks = taskBuffer.filter((task) => {
     switch (filter) {
@@ -57,14 +59,18 @@ const HomePage = () => {
       <div className="container pt-8 mx-auto relative z-10">
         <div className="w-full max-w-2xl p-6 mx-auto space-y-6">
           <Header />
-          <AddTask />
+          <AddTask handleNewTaskAdded={handleTaskChanged} />
           <StatsAndFilters
             activeTasksCount={activeTaskCount}
             completedTasksCount={completedTaskCount}
             filter={filter}
             setFilter={setFilter}
           />
-          <TaskList filteredTasks={filteredTasks} filter={filter} />
+          <TaskList
+            filteredTasks={filteredTasks}
+            filter={filter}
+            handleTaskChanged={handleTaskChanged}
+          />
           <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
             <TaskListPagination />
             <DateTimeFilter />

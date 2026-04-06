@@ -2,7 +2,7 @@ import React from "react";
 import TaskEmptyState from "./TaskEmptyState";
 import TaskCard from "./TaskCard";
 
-const TaskList = ({ filteredTasks, filter }) => {
+const TaskList = ({ filteredTasks, filter, handleTaskChanged }) => {
   if (!filteredTasks || filteredTasks.length === 0)
     return <TaskEmptyState filter={filter} />;
   return (
@@ -12,7 +12,7 @@ const TaskList = ({ filteredTasks, filter }) => {
           key={task._id ?? index}
           task={task}
           index={index}
-          // handleTaskChanged={handleTaskChanged}
+          handleTaskChanged={handleTaskChanged}
         />
       ))}
     </div>
